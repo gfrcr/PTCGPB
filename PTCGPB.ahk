@@ -3,9 +3,9 @@ version = Arturos PTCGP Bot
 CoordMode, Mouse, Screen
 SetTitleMatchMode, 3
 
-githubUser := "Arturo-1212"
+githubUser := "gfrcr"
 repoName := "PTCGPB"
-localVersion := "v6.3.28"
+localVersion := "v1.4.0"
 scriptFolder := A_ScriptDir
 zipPath := A_Temp . "\update.zip"
 extractPath := A_Temp . "\update"
@@ -18,7 +18,6 @@ if not A_IsAdmin
 }
 
 MsgBox, 64, The project is now licensed under CC BY-NC 4.0, The original intention of this project was not for it to be used for paid services even those disguised as 'donations.' I hope people respect my wishes and those of the community. `nThe project is now licensed under CC BY-NC 4.0, which allows you to use, modify, and share the software only for non-commercial purposes. Commercial use, including using the software to provide paid services or selling it (even if donations are involved), is not allowed under this license. The new license applies to this and all future releases.
-
 CheckForUpdate()
 
 KillADBProcesses()
@@ -103,6 +102,9 @@ IniRead, minStarsA2b, Settings.ini, UserSettings, minStarsA2b, 0
 
 IniRead, heartBeatDelay, Settings.ini, UserSettings, heartBeatDelay, 30
 IniRead, sendAccountXml, Settings.ini, UserSettings, sendAccountXml, 0
+IniRead, tesseractPath, Settings.ini, UserSettings, tesseractPath, C:\Program Files\Tesseract-OCR\tesseract.exe
+IniRead, applyRoleFilters, Settings.ini, UserSettings, applyRoleFilters, 0
+IniRead, debugMode, Settings.ini, UserSettings, debugMode, 0
 
 ; Create a stylish GUI with custom colors and modern look
 Gui, Color, 1E1E1E, 333333 ; Dark theme background
@@ -134,7 +136,7 @@ Gui, Add, Checkbox, % (runMain ? "Checked" : "") " vrunMain gmainSettings x20 y1
 Gui, Add, Edit, % "vMains w50 x125 y148 h20 -E0x200 Background2A2A2A " . sectionColor . " Center" . (runMain ? "" : " Hidden"), %Mains%
 
 ; ========== Time Settings Section ==========
-sectionColor := "c9370DB" ; Purple
+sectionColor := "cWhite" ; "c9370DB" ; Purple
 Gui, Add, GroupBox, x5 y180 w240 h125 %sectionColor%, Time Settings
 Gui, Add, Text, x20 y205 %sectionColor%, Action Delay (ms):
 Gui, Add, Edit, vDelay w60 x145 y203 h20 -E0x200 Background2A2A2A cWhite Center, %Delay%
@@ -145,7 +147,7 @@ Gui, Add, Edit, vwaitTime w60 x145 y253 h20 -E0x200 Background2A2A2A cWhite Cent
 Gui, Add, Checkbox, % (slowMotion ? "Checked" : "") " vslowMotion x20 y280 " . sectionColor, Base Game Compatibility
 
 ; ========== System Settings Section ==========
-sectionColor := "c4169E1" ; Royal Blue
+sectionColor := "cWhite" ; "c4169E1" ; Royal Blue
 Gui, Add, GroupBox, x5 y305 w240 h210 %sectionColor%, System Settings
 Gui, Add, Text, x20 y325 %sectionColor%, Monitor:
 SysGet, MonitorCount, MonitorCount
@@ -221,7 +223,7 @@ Gui, Add, Checkbox, % (autoLaunchMonitor ? "Checked" : "") " vautoLaunchMonitor 
 ; ==============================
 
 ; ========== God Pack Settings Section ==========
-sectionColor := "c39FF14" ; Neon green
+sectionColor := "cWhite" ; "c39FF14" ; Neon green
 Gui, Add, GroupBox, x255 y0 w240 h130 %sectionColor%, God Pack Settings
 Gui, Add, Text, x270 y25 %sectionColor%, Min. 2 Stars:
 Gui, Add, Edit, vminStars w25 x350 y23 h20 -E0x200 Background2A2A2A cWhite Center, %minStars%
@@ -235,7 +237,7 @@ else if (deleteMethod = "3 Pack")
 	defaultDelete := 2
 else if (deleteMethod = "Inject")
 	defaultDelete := 3
-else if (deleteMethod = "5 Pack (Fast)")
+else if (deleteMethod = "5 Pack (Fast)" || deleteMethod = "5 Pack No Remove")
 	defaultDelete := 4
 ;	SquallTCGP 2025.03.12 - 	Adding the delete method 5 Pack (Fast) to the delete method dropdown list.
 Gui, Add, DropDownList, vdeleteMethod gdeleteSettings choose%defaultDelete% x325 y48 w100 Background2A2A2A cWhite, 5 Pack|3 Pack|Inject|5 Pack (Fast)
@@ -243,7 +245,7 @@ Gui, Add, Checkbox, % (packMethod ? "Checked" : "") " vpackMethod x280 y80 " . s
 Gui, Add, Checkbox, % (nukeAccount ? "Checked" : "") " vnukeAccount x280 y100 " . sectionColor, Menu Delete Account
 
 ; ========== Pack Selection Section ==========
-sectionColor := "cFFD700" ; Gold
+sectionColor := "cWhite" ; "cFFD700" ; Gold
 Gui, Add, GroupBox, x255 y130 w240 h115 %sectionColor%, Pack Selection
 Gui, Add, Checkbox, % (Shining ? "Checked" : "") " vShining x280 y155 " . sectionColor, Shining
 Gui, Add, Checkbox, % (Arceus ? "Checked" : "") " vArceus x280 y175 " . sectionColor, Arceus
@@ -255,7 +257,7 @@ Gui, Add, Checkbox, % (Mewtwo ? "Checked" : "") " vMewtwo x365 y195 " . sectionC
 Gui, Add, Checkbox, % (Mew ? "Checked" : "") " vMew x365 y215 " . sectionColor, Mew
 
 ; ========== Card Detection Section ==========
-sectionColor := "cFF4500" ; Orange Red
+sectionColor := "cWhite" ; "cFF4500" ; Orange Red
 Gui, Add, GroupBox, x255 y245 w240 h160 %sectionColor%, Card Detection ; Orange Red
 Gui, Add, Checkbox, % (FullArtCheck ? "Checked" : "") " vFullArtCheck x270 y270 " . sectionColor, Single Full Art
 Gui, Add, Checkbox, % (TrainerCheck ? "Checked" : "") " vTrainerCheck x385 y270 " . sectionColor, Single Trainer
@@ -275,7 +277,7 @@ Gui, Add, Checkbox, % (ImmersiveCheck ? "Checked" : "") " vImmersiveCheck x270 y
 ; ==============================
 
 ; ========== Discord Settings Section ==========
-sectionColor := "cFF69B4" ; Hot pink
+sectionColor := "cWhite" ; "cFF69B4" ; Hot pink
 Gui, Add, GroupBox, x505 y0 w240 h130 %sectionColor%, Discord Settings
 if(StrLen(discordUserID) < 3)
 	discordUserID =
@@ -288,7 +290,7 @@ Gui, Add, Edit, vdiscordWebhookURL w210 x520 y80 h20 -E0x200 Background2A2A2A cW
 Gui, Add, Checkbox, % (sendAccountXml ? "Checked" : "") " vsendAccountXml x520 y105 " . sectionColor, Send Account XML
 
 ; ========== Heartbeat Settings Section ==========
-sectionColor := "c00FFFF" ; Cyan
+sectionColor := "cWhite" ; "c00FFFF" ; Cyan
 Gui, Add, GroupBox, x505 y130 w240 h160 %sectionColor%, Heartbeat Settings
 Gui, Add, Checkbox, % (heartBeat ? "Checked" : "") " vheartBeat x520 y155 gdiscordSettings " . sectionColor, Discord Heartbeat
 
@@ -335,6 +337,21 @@ Gui, Add, Text, x270 y425 %sectionColor%, ids.txt API:
 Gui, Add, Edit, vmainIdsURL w460 x270 y445 h20 -E0x200 Background2A2A2A cWhite, %mainIdsURL%
 Gui, Add, Text, x270 y465 %sectionColor%, vip_ids.txt (GP Test Mode) API:
 Gui, Add, Edit, vvipIdsURL w460 x270 y485 h20 -E0x200 Background2A2A2A cWhite, %vipIdsURL%
+
+
+; ========= Column 1-3 =========
+; ==============================
+
+; ========== Add-On Settings Section ==========
+sectionColor := "cWhite"
+Gui, Add, GroupBox, x5 y515 w740 h50 %sectionColor%, Extra Settings
+
+Gui, Add, Text, x15 y535 %sectionColor%, Tesseract Path:
+Gui, Add, Edit, vtesseractPath w300 x115 y534 h20 -E0x200 Background2A2A2A cWhite, %tesseractPath%
+Gui, Add, Checkbox, % (applyRoleFilters ? "Checked" : "") " vapplyRoleFilters x455 y535 " . sectionColor, Use Role-Based Filters
+Gui, Add, Checkbox, % (debugMode ? "Checked" : "") " vdebugMode x20 y500 " . sectionColor, Debug Mode
+
+
 
 Gui, Show, , %localVersion% PTCGPB Bot Setup [Non-Commercial 4.0 International License]
 Return
@@ -517,9 +534,12 @@ Start:
 	IniWrite, %minStarsA2Palkia%, Settings.ini, UserSettings, minStarsA2Palkia
 	IniWrite, %minStarsA2a%, Settings.ini, UserSettings, minStarsA2a
 	IniWrite, %minStarsA2b%, Settings.ini, UserSettings, minStarsA2b
-	
+		
 	IniWrite, %heartBeatDelay%, Settings.ini, UserSettings, heartBeatDelay
 	IniWrite, %sendAccountXml%, Settings.ini, UserSettings, sendAccountXml
+	IniWrite, %tesseractPath%, Settings.ini, UserSettings, tesseractPath
+	IniWrite, %applyRoleFilters%, Settings.ini, UserSettings, applyRoleFilters
+	IniWrite, %debugMode%, Settings.ini, UserSettings, debugMode
 	
 	; Using FriendID field to provide a URL to download ids.txt is deprecated.
 	if (inStr(FriendID, "http")) {
@@ -653,7 +673,51 @@ Start:
 
 		; Display pack status at the bottom of the first reroll instance
 		CreateStatusMessage(packStatus, ((Mains * scaleParam) + 5), 490)
-
+		
+		; Check if we need to force a heartbeat check (GP Test was activated)
+		IniRead, forceCheck, HeartBeat.ini, HeartBeat, ForceCheck, 0
+		if(heartBeat && forceCheck = 1) {
+			; Reset the force check flag
+			IniWrite, 0, HeartBeat.ini, HeartBeat, ForceCheck
+			
+			onlineAHK := "Online: "
+			offlineAHK := "Offline: "
+			
+			; Check Main status (should be offline since GP Test was activated)
+			if(runMain) {
+				IniRead, value, HeartBeat.ini, HeartBeat, Main
+				if(value)
+					onlineAHK := "Online: Main, "
+				else
+					offlineAHK := "Offline: Main, "
+				; Don't reset the value to keep Main showing as offline during GP Test
+			}
+			
+			; Use existing instance status values
+			for index, value in Online {
+				if(index = Online.MaxIndex())
+					commaSeparate := "."
+				else
+					commaSeparate := ", "
+				if(value)
+					onlineAHK .= A_Index . commaSeparate
+				else
+					offlineAHK .= A_Index . commaSeparate
+			}
+			
+			if(offlineAHK = "Offline: ")
+				offlineAHK := "Offline: none."
+			if(onlineAHK = "Online: ")
+				onlineAHK := "Online: none."
+			
+			; Send the heartbeat message to Discord
+			discMessage := "\n" . onlineAHK . "\n" . offlineAHK . "\n" . packStatus . "\nVersion: " . RegExReplace(githubUser, "-.*$") . "-" . localVersion
+			discMessage .= typeMsg
+			discMessage .= selectMsg
+			if(heartBeatName)
+				discordUserID := heartBeatName
+			LogToDiscord(discMessage, , discordUserID)
+		}
 		if(heartBeat)
 			if((A_Index = 1 || (Mod(A_Index, (heartBeatDelay // 0.5)) = 0))) {
 				onlineAHK := "Online: "
@@ -1131,4 +1195,59 @@ VersionCompare(v1, v2) {
 	return 0 ; Versions are equal
 }
 
-~+F7::ExitApp
+~+F7::
+    ; Set heartbeat flags
+    IniWrite, 0, HeartBeat.ini, HeartBeat, Main
+    IniWrite, 1, HeartBeat.ini, HeartBeat, ForceCheck
+    
+    ; Prepare heartbeat message with all instances offline
+    offlineAHK := "Offline: Main"
+    onlineAHK := "Online: none."
+    
+    ; Count instances from settings
+    IniRead, Instances, Settings.ini, UserSettings, Instances, 1
+    
+    ; Add all instances to offline list
+    if (Instances > 0) {
+        offlineAHK .= ", "
+        Loop, %Instances% {
+            if (A_Index = Instances)
+                offlineAHK .= A_Index . "."
+            else
+                offlineAHK .= A_Index . ", "
+        }
+    } else {
+        offlineAHK .= "."
+    }
+    
+    ; Get needed settings
+    IniRead, heartBeatName, Settings.ini, UserSettings, heartBeatName, ""
+    IniRead, discordUserID, Settings.ini, UserSettings, discordUserId, ""
+    
+    ; Current stats
+    totalFile := A_ScriptDir . "\json\total.json"
+    if FileExist(totalFile) {
+        FileRead, totalContent, %totalFile%
+        RegExMatch(totalContent, """total_sum"":\s*(\d+)", totalMatch)
+        total := totalMatch1
+    } else {
+        total := 0
+    }
+    
+    ; Calculate runtime
+    totalSeconds := Round((A_TickCount - rerollTime) / 1000)
+    mminutes := Floor(totalSeconds / 60)
+    packStatus := "Time: " . mminutes . "m Packs: " . total
+    packStatus .= "   |   Avg: " . Round(total / mminutes, 2) . " packs/min"
+    
+    ; Send shutdown message
+    discMessage := "\n" . onlineAHK . "\n" . offlineAHK . "\n" . packStatus . "\nVersion: " . RegExReplace(githubUser, "-.*$") . "-" . localVersion
+    discMessage .= typeMsg
+    discMessage .= selectMsg
+    
+    if(heartBeatName)
+        discordUserID := heartBeatName
+    
+    LogToDiscord(discMessage, , discordUserID)
+    ExitApp
+return
